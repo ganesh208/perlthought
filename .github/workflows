@@ -1,0 +1,36 @@
+name: Deploy Application
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on pushes to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Use Ubuntu as the runner for the job
+  
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2  # Checkout the repository content
+  
+    - name: Install Node.js
+      uses: actions/setup-node@v2  # Set up Node.js environment
+      with:
+        node-version: '14'  # Specify Node.js version
+
+    - name: Install Dependencies
+      run: npm install  # Install project dependencies
+      
+    - name: Build Application
+      run: npm run build  # Build the Node.js application
+
+    - name: Terraform Init
+      run: terraform init  # Initialize Terraform
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve  # Apply Terraform changes
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Pass AWS credentials from secrets
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    # Add additional steps as needed, such as running tests or deploying to specific environments
